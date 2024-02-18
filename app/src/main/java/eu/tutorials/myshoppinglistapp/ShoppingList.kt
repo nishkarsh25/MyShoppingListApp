@@ -69,6 +69,56 @@ fun ShoppingListItem(
         }
     }
 }
+
+@Composable
+fun ShoppingItemEditor(
+    item: ShoppingItem,
+    onEditComplete: (String, Int) -> Unit,
+    onCancel: () -> Unit
+){
+    var editedName by remember { mutableStateOf(item.name) }
+    var editedQuantity by remember { mutableStateOf(item.quantity.toString()) }
+
+    AlertDialog(
+        onDismissRequest = onCancel,
+        confirmButton = {
+            Button(onClick = {
+                onEditComplete(editedName, editedQuantity.toIntOrNull() ?: 1)
+            }) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onCancel) {
+                Text("Cancel")
+            }
+        },
+        title = { Text("Edit Shopping Item") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = editedName,
+                    onValueChange = { editedName = it },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+
+                OutlinedTextField(
+                    value = editedQuantity,
+                    onValueChange = { editedQuantity = it },
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+            }
+        }
+    )
+}
+
+
 @Composable
 fun ShoppingListApp()
 {
@@ -164,5 +214,22 @@ fun ShoppingListApp()
                 }
             })
 
+    }
+
+    selectedItem?.let { item ->
+        ShoppingItemEditor(
+            item = item,
+            onEditComplete = { editedName, editedQuantity ->
+                sItems = sItems.map {
+                    if (it == item) {
+                        it.copy(name = editedName, quantity = editedQuantity)
+                    } else {
+                        it
+                    }
+                }
+                selectedItem = null
+            },
+            onCancel = { selectedItem = null } // Close the dialog
+        )
     }
 }
