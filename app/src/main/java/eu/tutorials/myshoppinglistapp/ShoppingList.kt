@@ -59,7 +59,31 @@ fun ShoppingListApp()
         AlertDialog(
             onDismissRequest = { showDialog = false },
             confirmButton = {
-                Button(onClick = {}) {
+                Button(onClick = {
+                    if (itemName.isNotBlank() && itemQuantity.isNotBlank()) {
+                        try {
+                            val newItem = ShoppingItem(
+                                id = sItems.size + 1,
+                                name = itemName,
+                                quantity = itemQuantity.toInt()
+                            )
+                            sItems = sItems + newItem
+                            showDialog = false
+                            itemName = ""
+                            itemQuantity = ""
+                        } catch (e: NumberFormatException) {
+                            // Handle invalid quantity input
+                            showDialog = false
+                            itemName = ""
+                            itemQuantity = ""
+                            // Optionally show an error message or log the error
+                        }
+                    } else {
+                        // Show a message if either item name or quantity is blank
+                        showDialog = false
+                        // Optionally, you can set a state variable here to display an error message
+                    }
+                }) {
                     Text("Add")
                 }
             },
